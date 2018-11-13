@@ -210,32 +210,32 @@ func CDLDRAGONFLYDOJI(klines []Kline) int {
 }
 
 // Engulfing Pattern
+//两日K线模式，以多头吞噬为例，第一日为阴线， 第二日阳线，第一日的开盘价和收盘价在第二日开盘价收盘价之内，但不能完全相同。
 func CDLENGULFING(klines []Kline) int {
 	if klines[0].isYin() && klines[1].isYang() {
-		if klines[0].Open < klines[1].Open && klines[0].Close > klines[1].Close {
+		if klines[0].Open < klines[1].Close && klines[0].Close > klines[1].Open {
 			return KRISE
-		}
-	}
-	if klines[0].isYang() && klines[1].isYin() {
-		if klines[0].Open < klines[1].Open && klines[0].Close > klines[1].Close {
-			return KFALL
 		}
 	}
 	return 0
 }
 
 // Evening Doji Star
+// 三日K线模式，基本模式为暮星，第二日收盘价和开盘价相同，预示顶部反转。
 func CDLEVENINGDOJISTAR(klines []Kline) int {
-	if klines[0].isYang() && klines[1].isStar() && klines[2].isYin() {
-		return KFALL
+	if klines[0].isYang() && klines[2].isYin() {
+		if klines[1].Open == klines[1].Close {
+			return KFALL
+		}
 	}
 	return 0
 }
 
 // Evening Star
+// 三日K线模式，与晨星相反，上升趋势中, 第一日阳线，第二日价格振幅较小，第三日阴线，预示顶部反转。
 func CDLEVENINGSTAR(klines []Kline) int {
 	if klines[0].isYang() && klines[2].isYin() {
-		if klines[0].isBig() && klines[1].isSmall() && klines[2].isBig() && klines[2].Close < (klines[0].Open+klines[0].Close)/2 && klines[2].Open < klines[1].Open {
+		if klines[1].isSmall() {
 			return KFALL
 		}
 	}
@@ -248,29 +248,53 @@ func CDLGAPSIDESIDEWHITE(klines []Kline) int {
 }
 
 // Gravestone Doji
+// 一日K线模式，开盘价与收盘价相同，上影线长，无下影线，预示底部反转。
 func CDLGRAVESTONEDOJI(klines []Kline) int {
+	if klines[0].Open == klines[0].Close {
+		//什么叫长?
+		if klines[0].Low == klines[0].Open && klines[0].High > 5 { //TODO
+
+		}
+	}
 	return 0
 }
 
 // Hammer
 func CDLHAMMER(klines []Kline) int {
+	if klines[0].isHammerLine() {
+		return KFLAT
+	}
 	return 0
 }
 
 // Hanging Man
+// 一日K线模式，形状与锤子类似，处于上升趋势的顶部，预示着趋势反转。
 func CDLHANGINGMAN(klines []Kline) int {
+	if klines[0].isHammerLine() {
+		return KFALL
+	}
 	return 0
 }
 
 // Harami Pattern
-// 二日K线模式，分多头母子与空头母子，两者相反，以多头母子为例，在下跌趋势中，第一日K线长阴， 第二日开盘价收盘价在第一日价格振幅之内，为阳线，预示趋势反转，股价上升。
+// 二日K线模式，多头母子为例，在下跌趋势中，第一日K线长阴， 第二日开盘价收盘价在第一日价格振幅之内，为阳线，预示趋势反转，股价上升。
 func CDLHARAMI(klines []Kline) int {
+	if klines[0].isYin() && klines[0].isBig() && klines[1].isYang() {
+		if klines[1].Open > klines[0].Low && klines[1].Close < klines[0].High {
+			return KRISE
+		}
+	}
 	return 0
 }
 
 // Harami Cross Pattern
-//二日K线模式，与母子县类似，若第二日K线是十字线， 便称为十字孕线，预示着趋势反转。
+//二日K线模式，多头为例,与母子线类似，若第二日K线是十字线， 便称为十字孕线，预示着趋势反转。
 func CDLHARAMICROSS(klines []Kline) int {
+	if klines[0].isYin() && klines[0].isBig() {
+		if klines[1].isStar() {
+			return KRISE
+		}
+	}
 	return 0
 }
 
@@ -295,39 +319,61 @@ func CDLHIKKAKEMOD(klines []Kline) int {
 // Homing Pigeon
 // 二日K线模式，与母子线类似，不同的的是二日K线颜色相同， 第二日最高价、最低价都在第一日实体之内，预示着趋势反转。
 func CDLHOMINGPIGEON(klines []Kline) int {
+
 	return 0
 }
 
 // Identical Three Crows
 // 三日K线模式，上涨趋势中，三日都为阴线，长度大致相等， 每日开盘价等于前一日收盘价，收盘价接近当日最低价，预示价格下跌。
 func CDLIDENTICAL3CROWS(klines []Kline) int {
+	if klines[0].isYin() && klines[1].isYin() && klines[2].isYin() {
+		if (klines[0].Open-klines[0].Close) == (klines[1].Open-klines[1].Close) && (klines[1].Open-klines[1].Close) == (klines[2].Open-klines[2].Close) {
+			if klines[1].Open == klines[0].Close && klines[2].Open == klines[1].Close {
+				if isNear(klines[0].Close, klines[0].Low) != 0 && isNear(klines[1].Close, klines[1].Low) != 0 && isNear(klines[2].Close, klines[2].Low) != 0 {
+					return KFALL
+				}
+			}
+
+		}
+	}
+
 	return 0
 }
 
 // In-Neck Pattern
 // 二日K线模式，下跌趋势中，第一日长阴线， 第二日开盘价较低，收盘价略高于第一日收盘价，阳线，实体较短，预示着下跌继续。
 func CDLINNECK(klines []Kline) int {
+	if klines[0].isYin() && klines[0].isBig() && klines[1].isYang() && klines[1].isSmall() {
+		if klines[1].Open < klines[0].Low && isNear(klines[1].Close, klines[0].Close) == 1 {
+			return KFALL
+		}
+	}
 	return 0
 }
 
 // Inverted Hammer
 // 一日K线模式，上影线较长，长度为实体2倍以上， 无下影线，在下跌趋势底部，预示着趋势反转。
 func CDLINVERTEDHAMMER(klines []Kline) int {
+	if klines[0].isinvertedHammer() {
+		return KFLAT
+	}
 	return 0
 }
 
 // Kicking
-
+// 二日K线模式，与分离线类似，两日K线为秃线，颜色相反，存在跳空缺口。
 func CDLKICKING(klines []Kline) int {
 	return 0
 }
 
 // Kicking - bull/bear determined by the longer marubozu
+// 二日K线模式，与反冲形态类似，较长缺影线决定价格的涨跌。
 func CDLKICKINGBYLENGTH(klines []Kline) int {
 	return 0
 }
 
 // Ladder Bottom
+//五日K线模式，下跌趋势中，前三日阴线， 开盘价与收盘价皆低于前一日开盘、收盘价，第四日倒锤头，第五日开盘价高于前一日开盘价， 阳线，收盘价高于前几日价格振幅，预示着底部反转。
 func CDLLADDERBOTTOM(klines []Kline) int {
 	return 0
 }
@@ -335,18 +381,48 @@ func CDLLADDERBOTTOM(klines []Kline) int {
 // Long Legged Doji
 //一日K线模式，开盘价与收盘价相同居当日价格中部，上下影线长， 表达市场不确定性。
 func CDLLONGLEGGEDDOJI(klines []Kline) int {
+	Middle := (klines[0].High - klines[0].Low) / 2
+	if klines[0].Close == klines[0].Open && klines[0].Close == Middle {
+		// 如果影线很长
+		return KFLAT
+	}
 	return 0
 }
 
 // Long Line Candle
 //一日K线模式，K线实体长，无上下影线。
 func CDLLONGLINE(klines []Kline) int {
+	if klines[0].isBig() {
+		if klines[0].isYin() {
+			if klines[0].High == klines[0].Close && klines[0].Low == klines[0].Open {
+				return KFLAT
+			}
+		}
+
+		if klines[0].isYang() {
+			if klines[0].High == klines[0].Open && klines[0].Low == klines[0].Close {
+				return KFLAT
+			}
+		}
+	}
 	return 0
 }
 
 // Marubozu
 //一日K线模式，上下两头都没有影线的实体， 阴线预示着熊市持续或者牛市反转，阳线相反。
 func CDLMARUBOZU(klines []Kline) int {
+	if klines[0].isYin() {
+		if klines[0].High == klines[0].Close && klines[0].Low == klines[0].Open {
+			return KFALL
+		}
+	}
+
+	if klines[0].isYang() {
+		if klines[0].High == klines[0].Open && klines[0].Low == klines[0].Close {
+			return KFALL
+		}
+	}
+
 	return 0
 }
 
@@ -360,6 +436,7 @@ func CDLMATCHINGLOW(klines []Kline) int {
 }
 
 // Mat Hold
+//五日K线模式，上涨趋势中，第一日阳线，第二日跳空高开影线， 第三、四日短实体影线，第五日阳线，收盘价高于前四日，预示趋势持续。
 func CDLMATHOLD(klines []Kline) int {
 	return 0
 }
@@ -405,6 +482,8 @@ func CDLPIERCING(klines []Kline) int {
 }
 
 // Rickshaw Man
+// 一日K线模式，与长腿十字线类似， 若实体正好处于价格振幅中点，称为黄包车夫。
+// 什么叫长?
 func CDLRICKSHAWMAN(klines []Kline) int {
 	return 0
 }
@@ -512,10 +591,12 @@ func CDLTASUKIGAP(klines []Kline) int {
 }
 
 // Thrusting Pattern
+// 二日K线模式，与颈上线类似，下跌趋势中，第一日长阴线，第二日开盘价跳空， 收盘价略低于前一日实体中部，与颈上线相比实体较长，预示着趋势持续。
 func CDLTHRUSTING(klines []Kline) int {
-	if klines[0].isYin() && klines[1].isYang() {
-		//第一日长阴线
-
+	if klines[0].isYin() && klines[1].isYang() && klines[0].isBig() {
+		if klines[1].Open < klines[0].Low && isNear(klines[1].Close, 0.5*math.Abs(klines[0].Close-klines[0].Open)) == -1 {
+			return KFALL
+		}
 	}
 	return 0
 }

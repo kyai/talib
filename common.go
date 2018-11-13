@@ -51,13 +51,34 @@ func (kline Kline) isHammerLine() bool {
 	if kline.isYang() {
 		UpperShadow = kline.High - kline.Close
 		LowerShadow = kline.Open - kline.Low
-		if UpperShadow < 0.3*Entity && LowerShadow > 2*Entity {
+		if UpperShadow < 0.1*Entity && LowerShadow > 2*Entity {
 			return true
 		}
 	} else if kline.isYin() {
 		UpperShadow = kline.High - kline.Open
 		LowerShadow = kline.Close - kline.Low
-		if UpperShadow < 0.3*Entity && LowerShadow > 2*Entity {
+		if UpperShadow < 0.1*Entity && LowerShadow > 2*Entity {
+			return true
+		}
+	}
+	return false
+}
+
+//上影线较长，长度为实体2倍以上， 无下影线，在下跌趋势底部，预示着趋势反转。
+func (kline Kline) isinvertedHammer() bool {
+	Entity := math.Abs(kline.Close - kline.Open)
+	var UpperShadow float64
+	var LowerShadow float64
+	if kline.isYang() {
+		UpperShadow = kline.High - kline.Close
+		LowerShadow = kline.Open - kline.Low
+		if UpperShadow > 2*Entity && LowerShadow < 0.1*Entity {
+			return true
+		}
+	} else if kline.isYin() {
+		UpperShadow = kline.High - kline.Open
+		LowerShadow = kline.Close - kline.Low
+		if UpperShadow > 2*Entity && LowerShadow < 0.1*Entity {
 			return true
 		}
 	}
